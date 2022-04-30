@@ -1,9 +1,8 @@
 package middlewares
 
 import (
-	"errors"
-
 	"github.com/golang-jwt/jwt"
+	errorConv "github.com/gozzafadillah/helper/error"
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -22,7 +21,7 @@ func (jwtConf *ConfigJwt) Init() middleware.JWTConfig {
 		Claims:     &JwtCustomClaims{},
 		SigningKey: []byte(jwtConf.SecretJWT),
 		ErrorHandlerWithContext: middleware.JWTErrorHandlerWithContext(func(e error, c echo.Context) error {
-			return errors.New("jwt gagal dibuat")
+			return errorConv.Conversion(e)
 		}),
 	}
 }

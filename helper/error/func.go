@@ -14,5 +14,9 @@ func Conversion(err error) error {
 		strings.Contains(err.Error(), "missmatch") {
 		errNew = errors.New(ErrInvalid)
 	}
+	if strings.Contains(err.Error(), "jwt") ||
+		strings.Contains(err.Error(), "jwt token not found") {
+		errNew = errors.New(ErrInvalid)
+	}
 	return errNew
 }

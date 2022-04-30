@@ -14,14 +14,14 @@ type userRepo struct {
 // GetById implements UserDomain.Repository
 func (ur userRepo) GetById(id int) (domain UserDomain.Users, err error) {
 	var newRecord Users
-	err = ur.DB.Where("id = ?", id).Find(&newRecord).Error
+	err = ur.DB.Where("id = ?", id).First(&newRecord).Error
 	return toDomain(newRecord), err
 }
 
 // GetUsernamePassword implements UserDomain.Repository
 func (ur userRepo) GetUsernamePassword(username string, password string) (domain UserDomain.Users, err error) {
 	var record Users
-	errResp := ur.DB.Where("username = ? AND password = ?", username, password).Find(&record).Error
+	errResp := ur.DB.Where("username = ? AND password = ?", username, password).First(&record).Error
 	return toDomain(record), errResp
 }
 

@@ -44,6 +44,7 @@ func (uh UserHandler) Login(c echo.Context) error {
 	if err := c.Bind(&req); err != nil {
 		return errors.New("data gaada")
 	}
+
 	token, err := uh.service.Login(req.Username, req.Password)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{

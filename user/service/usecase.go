@@ -16,9 +16,11 @@ type userService struct {
 // CreateToken implements UserDomain.Service
 func (us userService) Login(username string, password string) (string, error) {
 	dataUser, err := us.Repository.GetUsernamePassword(username, password)
+
 	if err != nil {
-		return "", errorConv.Conversion(err)
+		return "token tidak dibuat", errorConv.Conversion(err)
 	}
+
 	token := us.jwtAuth.GenerateToken(dataUser.ID)
 	return token, nil
 }
