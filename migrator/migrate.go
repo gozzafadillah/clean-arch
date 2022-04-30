@@ -1,10 +1,11 @@
 package migrate
 
 import (
-	"github.com/gozzafadillah/app/config"
 	userRepo "github.com/gozzafadillah/user/repository/mysql"
+	"gorm.io/gorm"
 )
 
-func AutoMigrate() {
-	config.DB.AutoMigrate(&userRepo.Users{})
+func AutoMigrate(DB *gorm.DB) {
+
+	DB.AutoMigrate(&userRepo.Users{})
 }

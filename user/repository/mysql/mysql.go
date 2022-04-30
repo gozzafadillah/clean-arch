@@ -13,22 +13,22 @@ type userRepo struct {
 
 // GetById implements UserDomain.Repository
 func (ur userRepo) GetById(id int) (domain UserDomain.Users, err error) {
-	newRecord := Users{}
-	err = ur.DB.Find("id = ?", id).First(&newRecord).Error
-
+	var newRecord Users
+	err = ur.DB.Where("id = ?", id).Find(&newRecord).Error
 	return toDomain(newRecord), err
 }
 
 // GetUsernamePassword implements UserDomain.Repository
 func (ur userRepo) GetUsernamePassword(username string, password string) (domain UserDomain.Users, err error) {
-	panic("unimplemented")
+	var record Users
+	errResp := ur.DB.Where("username = ? AND password = ?", username, password).Find(&record).Error
+	return toDomain(record), errResp
 }
 
 // Save implements UserDomain.Repository
 func (ur userRepo) Save(domain UserDomain.Users) (id int, err error) {
-	var newRecord Users
-	err = ur.DB.Find("id = ?", id).First(&newRecord).Error
-	return newRecord.ID, err
+	err = ur.DB.Save(&domain).Error
+	return domain.ID, err
 }
 
 // ===============================================================================

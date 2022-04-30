@@ -5,8 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
 func InitDB() (DB *gorm.DB) {
 	username := "root"
 	password := ""

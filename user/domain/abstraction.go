@@ -1,7 +1,7 @@
 package UserDomain
 
 type Service interface {
-	CreateToken(username, password string) string
+	Login(username, password string) (string, error)
 	InsertData(domain Users) (response Users, err error)
 }
 

@@ -11,13 +11,14 @@ import (
 func main() {
 
 	db := config.InitDB()
-	migrate.AutoMigrate()
+	migrate.AutoMigrate(db)
 
 	user := user.NewUserFactory(db)
 	//Route
 	e := echo.New()
 
-	e.POST("/user", user.Create)
+	e.POST("/users", user.Create)
+	e.POST("/login", user.Login)
 
-	e.Start(":8080")
+	e.Logger.Fatal(e.Start(":8080"))
 }
