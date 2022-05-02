@@ -5,6 +5,8 @@ import (
 	"gorm.io/gorm"
 )
 
+const JwtSecret = "12345"
+
 func InitDB() (DB *gorm.DB) {
 	username := "root"
 	password := ""

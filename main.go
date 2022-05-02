@@ -2,34 +2,38 @@ package main
 
 import (
 	"github.com/gozzafadillah/app/config"
-	"github.com/gozzafadillah/app/middlewares"
+	_middleware "github.com/gozzafadillah/app/middlewares"
 	migrate "github.com/gozzafadillah/migrator"
+	"github.com/gozzafadillah/routes"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 
-	"github.com/gozzafadillah/user"
+	userAPI "github.com/gozzafadillah/user/handler/api"
+	userRepoMysql "github.com/gozzafadillah/user/repository/mysql"
+	userService "github.com/gozzafadillah/user/service"
 )
-
-const jwtToken = "123456"
 
 func main() {
 
 	db := config.InitDB()
 	migrate.AutoMigrate(db)
 
-	user := user.NewUserFactory(db)
-	//Route
+	configJWT := _middleware.ConfigJwt{
+		SecretJWT: "2345",
+	}
+
 	e := echo.New()
 
-	middlewares.LogMiddleware(e)
+	// Factory
+	userRepo := userRepoMysql.NewUserRepository(db)
+	userServ := userService.NewUserService(userRepo, &configJWT)
+	userHandler := userAPI.NewUserHandler(userServ)
 
-	auth := e.Group("")
-	auth.Use(middleware.JWT(middlewares.ConfigJwt{
-		SecretJWT: jwtToken,
-	}))
-	auth.POST("/users", user.Create)
-
-	e.POST("/login", user.Login)
+	//Route
+	routesInit := routes.ControllerList{
+		JWTMiddleware: configJWT.Init(),
+		UserHandler:   userHandler,
+	}
+	routesInit.RouteRegister(e)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

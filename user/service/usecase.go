@@ -1,12 +1,14 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/gozzafadillah/app/middlewares"
 	errorConv "github.com/gozzafadillah/helper/error"
 	UserDomain "github.com/gozzafadillah/user/domain"
 )
 
-type userService struct {
+type UserService struct {
 	Repository UserDomain.Repository
 	jwtAuth    *middlewares.ConfigJwt
 }
@@ -14,19 +16,23 @@ type userService struct {
 // ============================ Code Here ==============================
 
 // CreateToken implements UserDomain.Service
-func (us userService) Login(username string, password string) (string, error) {
+func (us UserService) Login(username string, password string) (string, error) {
 	dataUser, err := us.Repository.GetUsernamePassword(username, password)
 
 	if err != nil {
-		return "token tidak dibuat", errorConv.Conversion(err)
+		return "token failed generate", errorConv.Conversion(err)
 	}
 
-	token := us.jwtAuth.GenerateToken(dataUser.ID)
+	token, err := us.jwtAuth.GenerateToken(dataUser.ID)
+
+	if err != nil {
+		return "kosong da", errors.New("ada yang salah dengan anda")
+	}
 	return token, nil
 }
 
 // InsertData implements UserDomain.Service
-func (us userService) InsertData(domain UserDomain.Users) (response UserDomain.Users, err error) {
+func (us UserService) InsertData(domain UserDomain.Users) (response UserDomain.Users, err error) {
 	id, errorResp := us.Repository.Save(domain)
 
 	if errorResp != nil {
@@ -42,7 +48,7 @@ func (us userService) InsertData(domain UserDomain.Users) (response UserDomain.U
 // ======================================================================
 
 func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) UserDomain.Service {
-	return userService{
+	return UserService{
 		Repository: repo,
 		jwtAuth:    JWT,
 	}

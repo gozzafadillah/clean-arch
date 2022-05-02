@@ -27,16 +27,16 @@ func (jwtConf *ConfigJwt) Init() middleware.JWTConfig {
 }
 
 // GenerateToken jwt ...
-func (jwtConf *ConfigJwt) GenerateToken(userID int) string {
+func (jwtConf *ConfigJwt) GenerateToken(userID int) (string, error) {
 	claims := JwtCustomClaims{
 		ID: userID,
 	}
 
 	// Create token with claims
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, _ := t.SignedString([]byte(jwtConf.SecretJWT))
+	token, err := t.SignedString([]byte(jwtConf.SecretJWT))
 
-	return token
+	return token, err
 }
 
 // GetUser from jwt ...

@@ -2,6 +2,7 @@ package userApi
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	UserDomain "github.com/gozzafadillah/user/domain"
@@ -46,6 +47,9 @@ func (uh UserHandler) Login(c echo.Context) error {
 	}
 
 	token, err := uh.service.Login(req.Username, req.Password)
+
+	fmt.Println("data token ", token)
+
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"message": "anda tidak valid",
