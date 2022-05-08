@@ -57,7 +57,19 @@ func (uh UserHandler) Login(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data":    token,
-		"message": "JWT anda selesai",
+		"message":  "Success",
+		"response": http.StatusOK,
+		"data": map[string]interface{}{
+			"token": token,
+		},
 	})
+}
+
+func (uh UserHandler) UserRole(id int) string {
+	var role string
+	user, err := uh.service.GetId(id)
+	if err == nil {
+		role = user.Role
+	}
+	return role
 }

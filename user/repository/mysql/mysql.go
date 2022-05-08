@@ -9,6 +9,12 @@ type userRepo struct {
 	DB *gorm.DB
 }
 
+func NewUserRepository(db *gorm.DB) UserDomain.Repository {
+	return userRepo{
+		DB: db,
+	}
+}
+
 // =============================== code here ===================================
 
 // GetById implements UserDomain.Repository
@@ -27,14 +33,9 @@ func (ur userRepo) GetUsernamePassword(username string, password string) (domain
 
 // Save implements UserDomain.Repository
 func (ur userRepo) Save(domain UserDomain.Users) (id int, err error) {
+	domain.Role = "customer"
 	err = ur.DB.Save(&domain).Error
 	return domain.ID, err
 }
 
 // ===============================================================================
-
-func NewUserRepository(db *gorm.DB) UserDomain.Repository {
-	return userRepo{
-		DB: db,
-	}
-}

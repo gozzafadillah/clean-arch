@@ -3,6 +3,7 @@ package UserDomain
 type Service interface {
 	Login(username, password string) (string, error)
 	InsertData(domain Users) (response Users, err error)
+	GetId(id int) (response Users, err error)
 }
 
 type Repository interface {

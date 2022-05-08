@@ -1,12 +1,19 @@
 package request
 
-import UserDomain "github.com/gozzafadillah/user/domain"
+import (
+	"time"
+
+	UserDomain "github.com/gozzafadillah/user/domain"
+)
 
 type RequestJSON struct {
-	ID       int
-	Name     string `json:"name"`
-	Username string `json:"username"`
-	Password string `json:"password"`
+	ID        int
+	Name      string `json:"name"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Role      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 func ToDomain(req RequestJSON) UserDomain.Users {
@@ -15,5 +22,6 @@ func ToDomain(req RequestJSON) UserDomain.Users {
 		Name:     req.Name,
 		Username: req.Username,
 		Password: req.Password,
+		Role:     req.Role,
 	}
 }

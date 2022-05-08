@@ -13,7 +13,22 @@ type UserService struct {
 	jwtAuth    *middlewares.ConfigJwt
 }
 
+func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) UserDomain.Service {
+	return UserService{
+		Repository: repo,
+		jwtAuth:    JWT,
+	}
+}
+
 // ============================ Code Here ==============================
+// GetId implements UserDomain.Service
+func (us UserService) GetId(id int) (response UserDomain.Users, err error) {
+	response, err = us.Repository.GetById(id)
+	if err != nil {
+		return UserDomain.Users{}, err
+	}
+	return response, nil
+}
 
 // CreateToken implements UserDomain.Service
 func (us UserService) Login(username string, password string) (string, error) {
@@ -46,10 +61,3 @@ func (us UserService) InsertData(domain UserDomain.Users) (response UserDomain.U
 }
 
 // ======================================================================
-
-func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) UserDomain.Service {
-	return UserService{
-		Repository: repo,
-		jwtAuth:    JWT,
-	}
-}
