@@ -21,6 +21,21 @@ type RequestJSON struct {
 	UpdatedAt   time.Time
 }
 
+type RequestJSONCategory struct {
+	ID        int
+	Name      string `json:"name"`
+	Status    bool   `json:"status"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func ToDomainCategory(req RequestJSONCategory) productDomain.Category {
+	return productDomain.Category{
+		Name:   req.Name,
+		Status: req.Status,
+	}
+}
+
 func ToDomain(req RequestJSON) productDomain.Product {
 	return productDomain.Product{
 		Name:        req.Name,

@@ -21,6 +21,31 @@ type Products struct {
 	Status      bool
 }
 
+type Category struct {
+	gorm.Model
+	ID     int
+	Name   string
+	Status bool
+}
+
+// Category
+func toDomainCategory(rec Category) productDomain.Category {
+	return productDomain.Category{
+		ID:     rec.ID,
+		Name:   rec.Name,
+		Status: rec.Status,
+	}
+}
+
+func fromDomainCategory(rec productDomain.Category) Category {
+	return Category{
+		ID:     rec.ID,
+		Name:   rec.Name,
+		Status: rec.Status,
+	}
+}
+
+// Product
 func toDomain(rec Products) productDomain.Product {
 	return productDomain.Product{
 		ID:          rec.ID,

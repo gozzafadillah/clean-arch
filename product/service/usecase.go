@@ -38,7 +38,7 @@ func (ps ProductService) GetProductId(id int) (productDomain.Product, error) {
 
 // CreateProduct implements productDomain.Service
 func (ps ProductService) CreateProduct(domain productDomain.Product) (productDomain.Product, error) {
-	id, err := ps.Repository.Save(domain)
+	id, err := ps.Repository.SaveProduct(domain)
 	fmt.Println("id : ", id)
 	if err != nil {
 		return productDomain.Product{}, errorConv.Conversion(err)
@@ -80,6 +80,80 @@ func (ps ProductService) EditProduct(id int, domain productDomain.Product) (prod
 }
 
 // GetMinPrice implements productDomain.Service
-func (ProductService) GetMinPrice(domain productDomain.Product) ([]productDomain.Product, error) {
-	panic("unimplemented")
+func (ps ProductService) GetMinPrice() ([]productDomain.Product, error) {
+	data, err := ps.Repository.GetProducts()
+	if err != nil {
+		return []productDomain.Product{}, errorConv.Conversion(err)
+	}
+	fmt.Println("array before ", data)
+	var isDone = false
+	// Sort asc
+	for !isDone {
+		isDone = true
+		var i = 0
+		for i < len(data)-1 {
+			if data[i].Price > data[i+1].Price {
+				data[i], data[i+1] = data[i+1], data[i]
+				isDone = false
+			}
+			i++
+		}
+	}
+	fmt.Println("array after ", data)
+	return data, nil
+}
+
+// GetMaxPrice implements productDomain.Service
+func (ps ProductService) GetMaxPrice() ([]productDomain.Product, error) {
+	data, err := ps.Repository.GetProducts()
+	if err != nil {
+		return []productDomain.Product{}, errorConv.Conversion(err)
+	}
+	var isDone = false
+	// Sort Desc
+	for !isDone {
+		isDone = true
+		var i = 0
+		for i < len(data)-1 {
+			if data[i].Price < data[i+1].Price {
+				data[i], data[i+1] = data[i+1], data[i]
+				isDone = false
+			}
+			i++
+		}
+	}
+	return data, nil
+}
+
+// GetCategory implements productDomain.Service
+func (ps ProductService) GetCategory(name string) ([]productDomain.Product, error) {
+	data, err := ps.Repository.GetByNameCategory(name)
+	if err != nil {
+		return []productDomain.Product{}, errors.New("category not found")
+	}
+	return data, nil
+}
+
+// GetCategoryById implements productDomain.Service
+func (ps ProductService) GetCategoryById(id int) (productDomain.Category, error) {
+	data, err := ps.Repository.GetCategoryById(id)
+	if err != nil {
+		return productDomain.Category{}, errorConv.Conversion(err)
+	}
+	return data, nil
+}
+
+// CreateCategory implements productDomain.Service
+func (ps ProductService) CreateCategory(domain productDomain.Category) (productDomain.Category, error) {
+	id, err := ps.Repository.SaveCategory(domain)
+	fmt.Println("id : ", id)
+	if err != nil {
+		return productDomain.Category{}, errorConv.Conversion(err)
+	}
+	data, err := ps.Repository.GetCategoryById(id)
+	if err != nil {
+		return productDomain.Category{}, errorConv.Conversion(err)
+	}
+
+	return data, err
 }

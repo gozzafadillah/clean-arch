@@ -8,5 +8,5 @@ import (
 
 func AutoMigrate(DB *gorm.DB) {
 
-	DB.AutoMigrate(&userRepo.Users{}, &productRepo.Products{})
+	DB.AutoMigrate(&userRepo.Users{}, &productRepo.Products{}, &productRepo.Category{})
 }

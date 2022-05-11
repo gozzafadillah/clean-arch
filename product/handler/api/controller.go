@@ -1,6 +1,7 @@
 package productApi
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -22,10 +23,11 @@ func NewProductHandler(service productDomain.Service) ProductHandler {
 
 func (ph *ProductHandler) Create(c echo.Context) error {
 	req := request.RequestJSON{}
-
+	fmt.Println("req :", req)
 	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 
@@ -33,12 +35,14 @@ func (ph *ProductHandler) Create(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data":    response.FromDomain(responseData),
 		"message": "Insert success",
+		"rescode": http.StatusOK,
+		"data":    response.FromDomain(responseData),
 	})
 }
 
@@ -49,12 +53,14 @@ func (ph *ProductHandler) Delete(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "Bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data":    response.FromDomain(responseData),
 		"message": "delete success",
+		"rescode": http.StatusOK,
+		"data":    response.FromDomain(responseData),
 	})
 }
 
@@ -65,6 +71,7 @@ func (ph *ProductHandler) Update(c echo.Context) error {
 	if err := c.Bind(&rec); err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 
@@ -72,10 +79,12 @@ func (ph *ProductHandler) Update(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "edit success",
+		"rescode": http.StatusOK,
 		"data":    response,
 	})
 
@@ -87,10 +96,12 @@ func (ph *ProductHandler) GetProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "edit success",
+		"message": "get product by id success",
+		"rescode": http.StatusOK,
 		"data":    response,
 	})
 }
@@ -100,10 +111,112 @@ func (ph *ProductHandler) GetAllProduct(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "bad request",
+			"rescode": http.StatusBadRequest,
 		})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "edit success",
+		"message": "get all product success",
+		"rescode": http.StatusOK,
+		"data":    response,
+	})
+}
+func (ph *ProductHandler) FilterPrice(c echo.Context) error {
+	trigger := c.QueryParam("filter")
+	// Min price
+	if trigger == "min" {
+		response, err := ph.Service.GetMinPrice()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "bad request",
+				"rescode": http.StatusBadRequest,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "min price success",
+			"rescode": http.StatusOK,
+			"data":    response,
+		})
+		// Max price
+	} else if trigger == "max" {
+		response, err := ph.Service.GetMaxPrice()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"message": "bad request",
+				"rescode": http.StatusBadRequest,
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"message": "max price success",
+			"rescode": http.StatusOK,
+			"data":    response,
+		})
+	}
+	return c.JSON(http.StatusBadRequest, map[string]interface{}{
+		"message": "query parameter not match",
+		"rescode": http.StatusBadRequest,
+	})
+}
+
+func (ph *ProductHandler) CreateCategory(c echo.Context) error {
+	req := request.RequestJSONCategory{}
+
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "failed in json request",
+			"rescode": http.StatusBadRequest,
+		})
+	}
+
+	response, err := ph.Service.CreateCategory(request.ToDomainCategory(req))
+
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": err,
+			"rescode": http.StatusBadRequest,
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "create category product success",
+		"rescode": http.StatusOK,
+		"data":    response,
+	})
+}
+
+func (ph *ProductHandler) Category(c echo.Context) error {
+	category := c.QueryParam("category")
+	if category == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "please insert query parameter",
+		})
+	}
+
+	response, err := ph.Service.GetCategory(category)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": err,
+			"rescode": http.StatusBadRequest,
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "category " + category + " success",
+		"rescode": http.StatusOK,
+		"data":    response,
+	})
+}
+
+func (ph *ProductHandler) GetCategoryById(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	response, err := ph.Service.GetCategoryById(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": err,
+			"rescode": echo.ErrBadRequest,
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success get category",
+		"rescode": http.StatusOK,
 		"data":    response,
 	})
 }

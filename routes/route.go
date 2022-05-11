@@ -26,6 +26,8 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	// product public
 	product := e.Group("product")
 	product.GET("/all", cl.ProductHandler.GetAllProduct)
+	product.GET("/all", cl.ProductHandler.FilterPrice)
+	product.GET("/", cl.ProductHandler.Category)
 	product.GET("/:id", cl.ProductHandler.GetProduct)
 
 	// admin only / private
@@ -34,4 +36,9 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	authProduct.POST("/create", cl.ProductHandler.Create)
 	authProduct.DELETE("/delete/:id", cl.ProductHandler.Delete)
 	authProduct.PUT("/update/:id", cl.ProductHandler.Update)
+
+	authCategory := e.Group("category")
+	authCategory.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("admin", cl.UserHandler))
+	authCategory.POST("/create", cl.ProductHandler.CreateCategory)
+	authCategory.GET("/:id", cl.ProductHandler.GetCategoryById)
 }
