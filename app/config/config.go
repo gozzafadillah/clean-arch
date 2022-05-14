@@ -6,6 +6,8 @@ import (
 )
 
 const JwtSecret = "12345"
+const BaseURLRO = "https://api.rajaongkir.com/starter/"
+const Key = "677971ea001e7e7d868fc03c52412452"
 
 func InitDB() (DB *gorm.DB) {
 	username := "root"

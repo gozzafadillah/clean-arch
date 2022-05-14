@@ -4,15 +4,17 @@ import (
 	"github.com/gozzafadillah/app/middlewares"
 	"github.com/gozzafadillah/helper/validator"
 	productApi "github.com/gozzafadillah/product/handler/api"
+	transactionApi "github.com/gozzafadillah/transaction/handler/api"
 	userApi "github.com/gozzafadillah/user/handler/api"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 type ControllerList struct {
-	JWTMiddleware  middleware.JWTConfig
-	UserHandler    userApi.UserHandler
-	ProductHandler productApi.ProductHandler
+	JWTMiddleware      middleware.JWTConfig
+	UserHandler        userApi.UserHandler
+	ProductHandler     productApi.ProductHandler
+	TransactionHandler transactionApi.TransactionHandler
 }
 
 func (cl *ControllerList) RouteRegister(e *echo.Echo) {
@@ -41,4 +43,9 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	authCategory.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("admin", cl.UserHandler))
 	authCategory.POST("/create", cl.ProductHandler.CreateCategory)
 	authCategory.GET("/:id", cl.ProductHandler.GetCategoryById)
+
+	authTransaction := e.Group("checkout")
+	authTransaction.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
+	authTransaction.POST("/:id", cl.TransactionHandler.CreateData)
+	authTransaction.GET("/cek", cl.TransactionHandler.CreateOngkir)
 }

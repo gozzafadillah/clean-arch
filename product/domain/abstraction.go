@@ -11,6 +11,9 @@ type Service interface {
 	CreateCategory(domain Category) (Category, error)
 	GetCategoryById(id int) (Category, error)
 
+	// relation with transaction and checkout
+	CheckoutProductId(id int) (Product, error)
+
 	// feature
 	GetMinPrice() ([]Product, error)
 	GetMaxPrice() ([]Product, error)

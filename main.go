@@ -14,6 +14,10 @@ import (
 	productApi "github.com/gozzafadillah/product/handler/api"
 	productRepoMysql "github.com/gozzafadillah/product/repository/mysql"
 	productService "github.com/gozzafadillah/product/service"
+
+	transactionApi "github.com/gozzafadillah/transaction/handler/api"
+	transactionRepoMysql "github.com/gozzafadillah/transaction/repository/mysql"
+	transactionService "github.com/gozzafadillah/transaction/service"
 )
 
 func main() {
@@ -36,12 +40,17 @@ func main() {
 	productRepo := productRepoMysql.NewProductRepository(db)
 	productServ := productService.NewProductService(productRepo)
 	productHandler := productApi.NewProductHandler(productServ)
+	// Transaction
+	transactionRepo := transactionRepoMysql.NewTransactionRepository(db)
+	transactionServ := transactionService.NewTransactionService(transactionRepo)
+	transactionHandler := transactionApi.NewTransactionHandler(transactionServ, productServ)
 
 	//Route
 	routesInit := routes.ControllerList{
-		JWTMiddleware:  configJWT.Init(),
-		UserHandler:    userHandler,
-		ProductHandler: productHandler,
+		JWTMiddleware:      configJWT.Init(),
+		UserHandler:        userHandler,
+		ProductHandler:     productHandler,
+		TransactionHandler: transactionHandler,
 	}
 	routesInit.RouteRegister(e)
 

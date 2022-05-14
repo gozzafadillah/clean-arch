@@ -12,6 +12,15 @@ type ProductService struct {
 	Repository productDomain.Repository
 }
 
+// CheckoutProductId implements productDomain.Service
+func (ps ProductService) CheckoutProductId(id int) (productDomain.Product, error) {
+	data, err := ps.Repository.GetById(id)
+	if err != nil {
+		return productDomain.Product{}, errors.New("data tidak adaa")
+	}
+	return data, nil
+}
+
 func NewProductService(repo productDomain.Repository) productDomain.Service {
 	return ProductService{
 		Repository: repo,
