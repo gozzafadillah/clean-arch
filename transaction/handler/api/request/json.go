@@ -14,6 +14,7 @@ type RequestJSONCheckout struct {
 	Destination     string `json:"destination" form:"destination"`
 	Courier         string `json:"courier" form:"courier"`
 	Package         string `json:"package" form:"package"`
+	Status          bool
 }
 
 func ToDomainCheckout(req RequestJSONCheckout) transactionDomain.Checkout {

@@ -24,13 +24,15 @@ type Checkout struct {
 	ID              int
 	ProductID       int
 	TransactionCode string
-	Status          bool
 	Destination     string
 	Qty             int
 	Price           float64
 	Weight          float64
 	Courier         string
 	Package         string
+	Etd             string
+	Shipping_Price  float64
+	Status          bool
 }
 
 func toDomain(rec Transaction) transactionDomain.Transaction {
@@ -40,9 +42,9 @@ func toDomain(rec Transaction) transactionDomain.Transaction {
 		User_Id:          rec.User_Id,
 		Total_Qty:        rec.Total_Qty,
 		Total_Price:      rec.Total_Price,
-		Shipping_Price:   rec.Shipping_Price,
 		Shipping_Name:    rec.Shipping_Name,
 		Shipping_Package: rec.Shipping_Package,
+		Shipping_Price:   rec.Shipping_Price,
 		Etd:              rec.Etd,
 		CreatedAt:        time.Time{},
 		UpdatedAt:        time.Time{},
@@ -60,6 +62,8 @@ func toDomainCheckout(rec Checkout) transactionDomain.Checkout {
 		Destination:     rec.Destination,
 		Courier:         rec.Courier,
 		Package:         rec.Package,
+		Etd:             rec.Etd,
+		Shipping_Price:  rec.Shipping_Price,
 		CreatedAt:       time.Time{},
 		UpdatedAt:       time.Time{},
 	}

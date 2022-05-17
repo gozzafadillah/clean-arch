@@ -19,6 +19,20 @@ type TransactionRepo struct {
 	DB *gorm.DB
 }
 
+// ChangeStatus implements transactionDomain.Repository
+func (tr TransactionRepo) ChangeStatus(code string) error {
+	rec := Checkout{}
+	err := tr.DB.Model(&rec).Where("transaction_code = ?", code).Update("status", true).Error
+	return err
+}
+
+// GetCheckoutCode implements transactionDomain.Repository
+func (tr TransactionRepo) GetCheckoutCode(code string) (transactionDomain.Checkout, error) {
+	rec := Checkout{}
+	err := tr.DB.Where("transaction_code", code).First(&rec).Error
+	return toDomainCheckout(rec), err
+}
+
 func NewTransactionRepository(db *gorm.DB) transactionDomain.Repository {
 	return TransactionRepo{
 		DB: db,
@@ -145,11 +159,13 @@ func (tr TransactionRepo) GetCode(code string) (transactionDomain.Transaction, e
 }
 
 // SaveCheckout implements transactionDomain.Repository
-func (tr TransactionRepo) SaveCheckout(domainCheckout transactionDomain.Checkout, domain productDomain.Product, code string) (int, error) {
+func (tr TransactionRepo) SaveCheckout(domainCheckout transactionDomain.Checkout, domain productDomain.Product, code string, ongkir int, etd string) (int, error) {
 	domainCheckout.Price = float64(domain.Price * domainCheckout.Qty)
 	domainCheckout.Weight = domain.Weight * float64(domainCheckout.Qty)
 	domainCheckout.TransactionCode = code
 	domainCheckout.ProductID = domain.ID
+	domainCheckout.Shipping_Price = float64(ongkir)
+	domainCheckout.Etd = etd
 	err := tr.DB.Create(&domainCheckout).Error
 	return domainCheckout.ID, err
 }
@@ -167,11 +183,4 @@ func (tr TransactionRepo) SaveTransaction(code string, idUser int, ongkir int, e
 	transaction.Etd = etd
 	err := tr.DB.Create(&transaction).Error
 	return transaction.ID, err
-}
-
-// Delete implements transactionDomain.Repository
-func (tr TransactionRepo) Delete(id int) error {
-	rec := Transaction{}
-	err := tr.DB.Unscoped().Delete(&rec, id).Error
-	return err
 }
