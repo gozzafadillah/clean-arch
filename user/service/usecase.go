@@ -1,18 +1,18 @@
-package service
+package serviceUser
 
 import (
 	"errors"
 
 	"github.com/gozzafadillah/app/middlewares"
-	UserDomain "github.com/gozzafadillah/user/domain"
+	userDomain "github.com/gozzafadillah/user/domain"
 )
 
 type UserService struct {
-	Repository UserDomain.Repository
+	Repository userDomain.Repository
 	jwtAuth    *middlewares.ConfigJwt
 }
 
-func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) UserDomain.Service {
+func NewUserService(repo userDomain.Repository, JWT *middlewares.ConfigJwt) userDomain.Service {
 	return UserService{
 		Repository: repo,
 		jwtAuth:    JWT,
@@ -20,43 +20,43 @@ func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) User
 }
 
 // ============================ Code Here ==============================
-// GetId implements UserDomain.Service
-func (us UserService) GetId(id int) (data UserDomain.Users, err error) {
+// GetId implements userDomain.Service
+func (us UserService) GetId(id int) (data userDomain.Users, err error) {
 	data, err = us.Repository.GetById(id)
 	if err != nil {
-		return UserDomain.Users{}, err
+		return userDomain.Users{}, err
 	}
 	return data, nil
 }
 
-// BanUser implements UserDomain.Service
-func (us UserService) BanUser(username string) (UserDomain.Users, error) {
-	var rec UserDomain.Users
+// BanUser implements userDomain.Service
+func (us UserService) BanUser(username string) (userDomain.Users, error) {
+	var rec userDomain.Users
 	id, err := us.Repository.GetByUsername(username)
 	if err != nil {
-		return UserDomain.Users{}, errors.New("user not found, please check again")
+		return userDomain.Users{}, errors.New("user not found, please check again")
 	}
 	data, err := us.Repository.BanUser(id, rec)
 	if err != nil {
-		return UserDomain.Users{}, errors.New("user cant change status after get id")
+		return userDomain.Users{}, errors.New("user cant change status after get id")
 	}
 	return data, nil
 }
 
-// GetUsername implements UserDomain.Service
-func (us UserService) GetUsername(username string) (UserDomain.Users, error) {
+// GetUsername implements userDomain.Service
+func (us UserService) GetUsername(username string) (userDomain.Users, error) {
 	id, err := us.Repository.GetByUsername(username)
 	if err != nil {
-		return UserDomain.Users{}, errors.New("username not found")
+		return userDomain.Users{}, errors.New("username not found")
 	}
 	data, err := us.GetId(id)
 	if err != nil {
-		return UserDomain.Users{}, errors.New("id username not found")
+		return userDomain.Users{}, errors.New("id username not found")
 	}
 	return data, nil
 }
 
-// CreateToken implements UserDomain.Service
+// CreateToken implements userDomain.Service
 func (us UserService) Login(username string, password string) (string, error) {
 	dataUser, err := us.Repository.GetUsernamePassword(username, password)
 
@@ -72,16 +72,16 @@ func (us UserService) Login(username string, password string) (string, error) {
 	return token, nil
 }
 
-// InsertData implements UserDomain.Service
-func (us UserService) InsertData(domain UserDomain.Users) (response UserDomain.Users, err error) {
+// InsertData implements userDomain.Service
+func (us UserService) InsertData(domain userDomain.Users) (response userDomain.Users, err error) {
 	id, errorResp := us.Repository.Save(domain)
 
 	if errorResp != nil {
-		return UserDomain.Users{}, errors.New("can't insert to database")
+		return userDomain.Users{}, errors.New("can't insert to database")
 	}
 	record, errorResp2 := us.Repository.GetById(id)
 	if errorResp2 != nil {
-		return UserDomain.Users{}, errors.New("data not found")
+		return userDomain.Users{}, errors.New("data not found")
 	}
 	return record, nil
 }

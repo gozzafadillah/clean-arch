@@ -1,6 +1,6 @@
 package response
 
-import UserDomain "github.com/gozzafadillah/user/domain"
+import userDomain "github.com/gozzafadillah/user/domain"
 
 type ResponseJSON struct {
 	Username string `json:"username"`
@@ -9,7 +9,7 @@ type ResponseJSON struct {
 	Status   bool   `json:"status"`
 }
 
-func FromDomain(domain UserDomain.Users) ResponseJSON {
+func FromDomain(domain userDomain.Users) ResponseJSON {
 	return ResponseJSON{
 		Name:     domain.Name,
 		Username: domain.Username,

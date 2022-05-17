@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gozzafadillah/app/middlewares"
-	UserDomain "github.com/gozzafadillah/user/domain"
+	userDomain "github.com/gozzafadillah/user/domain"
 	"github.com/labstack/echo/v4"
 
 	"github.com/gozzafadillah/user/handler/api/request"
@@ -13,10 +13,10 @@ import (
 )
 
 type UserHandler struct {
-	service UserDomain.Service
+	service userDomain.Service
 }
 
-func NewUserHandler(service UserDomain.Service) UserHandler {
+func NewUserHandler(service userDomain.Service) UserHandler {
 	return UserHandler{
 		service: service,
 	}

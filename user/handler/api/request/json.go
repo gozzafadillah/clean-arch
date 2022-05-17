@@ -3,7 +3,7 @@ package request
 import (
 	"time"
 
-	UserDomain "github.com/gozzafadillah/user/domain"
+	userDomain "github.com/gozzafadillah/user/domain"
 )
 
 type RequestJSON struct {
@@ -17,8 +17,8 @@ type RequestJSON struct {
 	UpdatedAt time.Time
 }
 
-func ToDomain(req RequestJSON) UserDomain.Users {
-	return UserDomain.Users{
+func ToDomain(req RequestJSON) userDomain.Users {
+	return userDomain.Users{
 		ID:       req.ID,
 		Name:     req.Name,
 		Username: req.Username,
