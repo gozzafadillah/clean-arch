@@ -2,7 +2,6 @@ package userApi
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	UserDomain "github.com/gozzafadillah/user/domain"
@@ -25,16 +24,16 @@ func NewUserHandler(service UserDomain.Service) UserHandler {
 func (uh UserHandler) Create(c echo.Context) error {
 	req := request.RequestJSON{}
 	if err := c.Bind(&req); err != nil {
-		return errors.New("data gaada")
+		return errors.New("data invalid")
 	}
 
 	responseData, errResp := uh.service.InsertData(request.ToDomain(req))
 	if errResp != nil {
-		return errors.New("data error")
+		return errors.New("data invalid")
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"data":    response.FromDomain(responseData),
-		"message": "Insert success",
+		"message": "insert success",
 	})
 
 }
@@ -43,21 +42,19 @@ func (uh UserHandler) Login(c echo.Context) error {
 	req := request.RequestJSON{}
 
 	if err := c.Bind(&req); err != nil {
-		return errors.New("data gaada")
+		return errors.New("data invalid")
 	}
 
 	token, err := uh.service.Login(req.Username, req.Password)
 
-	fmt.Println("data token ", token)
-
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"message": "anda tidak valid",
+			"message": "invalid login",
 		})
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":  "Success",
+		"message":  "success login",
 		"response": http.StatusOK,
 		"data": map[string]interface{}{
 			"token": token,
@@ -65,11 +62,13 @@ func (uh UserHandler) Login(c echo.Context) error {
 	})
 }
 
-func (uh UserHandler) UserRole(id int) string {
+func (uh UserHandler) UserRole(id int) (string, bool) {
 	var role string
+	var status bool
 	user, err := uh.service.GetId(id)
 	if err == nil {
 		role = user.Role
+		status = user.Status
 	}
-	return role
+	return role, status
 }

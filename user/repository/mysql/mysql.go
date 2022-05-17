@@ -34,6 +34,7 @@ func (ur userRepo) GetUsernamePassword(username string, password string) (domain
 // Save implements UserDomain.Repository
 func (ur userRepo) Save(domain UserDomain.Users) (id int, err error) {
 	domain.Role = "customer"
+	domain.Status = true
 	err = ur.DB.Save(&domain).Error
 	return domain.ID, err
 }

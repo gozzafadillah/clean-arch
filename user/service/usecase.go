@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/gozzafadillah/app/middlewares"
-	errorConv "github.com/gozzafadillah/helper/error"
 	UserDomain "github.com/gozzafadillah/user/domain"
 )
 
@@ -35,10 +34,10 @@ func (us UserService) Login(username string, password string) (string, error) {
 	dataUser, err := us.Repository.GetUsernamePassword(username, password)
 
 	if err != nil {
-		return "token failed generate", errorConv.Conversion(err)
+		return "token failed generate", errors.New("username and password missmatch")
 	}
 
-	token, err := us.jwtAuth.GenerateToken(dataUser.ID)
+	token, err := us.jwtAuth.GenerateToken(dataUser.ID, dataUser.Status)
 
 	if err != nil {
 		return "kosong da", errors.New("ada yang salah dengan anda")
@@ -51,11 +50,11 @@ func (us UserService) InsertData(domain UserDomain.Users) (response UserDomain.U
 	id, errorResp := us.Repository.Save(domain)
 
 	if errorResp != nil {
-		return UserDomain.Users{}, errorConv.Conversion(errorResp)
+		return UserDomain.Users{}, errors.New("can't insert to database")
 	}
 	record, errorResp2 := us.Repository.GetById(id)
 	if errorResp2 != nil {
-		return UserDomain.Users{}, errorConv.Conversion(errorResp2)
+		return UserDomain.Users{}, errors.New("data not found")
 	}
 	return record, nil
 }

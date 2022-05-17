@@ -8,7 +8,8 @@ import (
 )
 
 type JwtCustomClaims struct {
-	ID int `json:"id"`
+	ID     int  `json:"id"`
+	Status bool `json:"status"`
 	jwt.StandardClaims
 }
 
@@ -27,9 +28,10 @@ func (jwtConf *ConfigJwt) Init() middleware.JWTConfig {
 }
 
 // GenerateToken jwt ...
-func (jwtConf *ConfigJwt) GenerateToken(userID int) (string, error) {
+func (jwtConf *ConfigJwt) GenerateToken(userID int, userStatus bool) (string, error) {
 	claims := JwtCustomClaims{
-		ID: userID,
+		ID:     userID,
+		Status: userStatus,
 	}
 
 	// Create token with claims

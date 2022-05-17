@@ -1,8 +1,8 @@
 package validator
 
 import (
-	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/gozzafadillah/app/middlewares"
 	userApi "github.com/gozzafadillah/user/handler/api"
@@ -14,13 +14,15 @@ func RoleValidation(role string, userControler userApi.UserHandler) echo.Middlew
 		return func(c echo.Context) error {
 			claims := middlewares.GetUser(c)
 			fmt.Println("claim : ", claims)
-			userRole := userControler.UserRole(claims.ID)
+			userRole, status := userControler.UserRole(claims.ID)
 			fmt.Println("userRole : ", userRole)
 
-			if userRole == role {
+			if userRole == role && status == true {
 				return hf(c)
 			} else {
-				return errors.New("role forbiden")
+				return c.JSON(http.StatusBadRequest, map[string]interface{}{
+					"message": "account not active, please contact admin",
+				})
 			}
 		}
 	}

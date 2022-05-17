@@ -107,19 +107,3 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 		"data":    response.FromDomainCheckout(transaction),
 	})
 }
-
-// func (th *TransactionHandler) CreateOngkir(c echo.Context) error {
-// 	id, err := th.ServiceTransaction.CheckCity("Jakarta Tenggara")
-// 	fmt.Println("id :", id)
-// 	if err != nil {
-// 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-// 			"message": "City not found",
-// 			"rescode": http.StatusBadRequest,
-// 		})
-// 	}
-// 	return c.JSON(http.StatusOK, map[string]interface{}{
-// 		"message": "Checkout success",
-// 		"rescode": http.StatusOK,
-// 		"data":    id,
-// 	})
-// }

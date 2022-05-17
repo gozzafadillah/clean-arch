@@ -14,6 +14,7 @@ type Users struct {
 	Username string
 	Password string
 	Role     string
+	Status   bool
 }
 
 func toDomain(rec Users) UserDomain.Users {
@@ -23,17 +24,8 @@ func toDomain(rec Users) UserDomain.Users {
 		Username:  rec.Username,
 		Password:  rec.Password,
 		Role:      rec.Role,
+		Status:    rec.Status,
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
-	}
-}
-
-func fromDomain(rec UserDomain.Users) Users {
-	return Users{
-		ID:       int(rec.ID),
-		Name:     rec.Name,
-		Username: rec.Username,
-		Password: rec.Password,
-		Role:     rec.Role,
 	}
 }

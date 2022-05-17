@@ -12,6 +12,7 @@ type RequestJSON struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Role      string
+	Status    bool
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -22,6 +23,7 @@ func ToDomain(req RequestJSON) UserDomain.Users {
 		Name:     req.Name,
 		Username: req.Username,
 		Password: req.Password,
+		Status:   req.Status,
 		Role:     req.Role,
 	}
 }
