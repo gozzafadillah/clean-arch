@@ -25,6 +25,13 @@ func NewTransactionRepository(db *gorm.DB) transactionDomain.Repository {
 	}
 }
 
+// UpdateQty implements transactionDomain.Repository
+func (tr TransactionRepo) UpdateQty(id int, qty int) error {
+	rec := productDomain.Product{}
+	err := tr.DB.Model(&rec).Where("id = ?", id).Update("qty", qty).Error
+	return err
+}
+
 // CheckCourier implements transactionDomain.Repository
 func (TransactionRepo) CheckCourier(origin int, cityDest int, weight int, courier string, paket string) bool {
 	url := config.BaseURLRO + "cost"

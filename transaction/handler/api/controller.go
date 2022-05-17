@@ -42,6 +42,12 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 	}
 
 	// cek quantity apakah melebihi kapasitas
+	if req.Qty >= product.Qty {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "qty not enough",
+			"rescode": http.StatusBadRequest,
+		})
+	}
 
 	// get user id
 	claims := middlewares.GetUser(c)
@@ -63,6 +69,10 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 			"rescode": http.StatusBadRequest,
 		})
 	}
+
+	// apakah user akan melakukan transaction ?
+	// if checkout == true
+
 	// origin
 	originId, err := th.ServiceTransaction.CheckCity(product.Origin)
 	if err != nil {
@@ -100,7 +110,15 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 	}
 
 	// mengurangi qty di product
-
+	newQty := product.Qty - respCheckout.Qty
+	fmt.Println("new qty :", newQty)
+	newStokQty := th.ServiceTransaction.UpdateStok(id, newQty)
+	if err := newStokQty; err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "stok cannot update",
+			"rescode": http.StatusBadRequest,
+		})
+	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "transaction success",
 		"rescode": http.StatusOK,

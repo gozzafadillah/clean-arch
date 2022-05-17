@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 
 	productDomain "github.com/gozzafadillah/product/domain"
 	transactionDomain "github.com/gozzafadillah/transaction/domain"
@@ -19,23 +18,27 @@ func NewTransactionService(repo transactionDomain.Repository) transactionDomain.
 	}
 }
 
+// UpdateStok implements transactionDomain.Service
+func (ts transactionService) UpdateStok(id int, qty int) error {
+	err := ts.Repository.UpdateQty(id, qty)
+	if err != nil {
+		return errors.New("qty cant update")
+	}
+	return nil
+}
+
 // Ongkir implements transactionDomain.Service
 func (ts transactionService) Ongkir(origin int, dest int, weight int, courier string, paket string) (int, string, error) {
 	data, err := ts.Repository.Ongkir(origin, dest, weight, courier)
 
-	fmt.Println("ongkir :", data)
-	fmt.Println("destination :", courier, paket)
-	// fmt.Println("service :", data.Rajaongkir.Results[0].Costs[0].Service)
 	if err != nil {
 		return 0, "", err
 	}
 	for i := 0; i < len(data.Rajaongkir.Results[0].Costs)-1; i++ {
 		results := data.Rajaongkir.Results[0].Costs
-		fmt.Println(results[0].Cost[0].Value)
 		if data.Rajaongkir.Results[0].Code == courier && results[i].Service == paket {
 			cost := int(results[i].Cost[0].Value)
 			etd := results[i].Cost[0].Etd
-			fmt.Println("cost ", cost)
 			return cost, etd, nil
 		}
 	}
@@ -59,12 +62,10 @@ func (ts transactionService) CreateCheckout(code string, domainCheckout transact
 	origin, _ := ts.Repository.GetCityId(domain.Origin)
 	weight := domain.Weight * float64(domainCheckout.Qty)
 	cekOngkir := ts.Repository.CheckCourier(origin, destination, int(weight), domainCheckout.Courier, domainCheckout.Package)
-	fmt.Println("cekOngkir :", cekOngkir)
 	if !cekOngkir {
 		return transactionDomain.Checkout{}, errors.New("ongkir not found")
 	}
 	id, err := ts.Repository.SaveCheckout(domainCheckout, domain, code)
-	fmt.Println("id : ", id)
 	if err != nil {
 		return transactionDomain.Checkout{}, errors.New("bad request")
 	}

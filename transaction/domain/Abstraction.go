@@ -13,6 +13,9 @@ type Service interface {
 	// Checkout
 	CreateCheckout(code string, domainCheckout Checkout, domain productDomain.Product) (Checkout, error)
 
+	// update qty stok produk
+	UpdateStok(id int, qty int) error
+
 	// third party
 	CheckCity(city string) (int, error)
 	Ongkir(origin, dest int, weight int, courier string, paket string) (int, string, error)
@@ -31,4 +34,5 @@ type Repository interface {
 	Delete(id int) error
 	CheckCourier(origin int, cityDest int, weight int, courier string, paket string) bool
 	Ongkir(origin int, cityDest int, weight int, courier string) (Ongkir, error)
+	UpdateQty(id int, qty int) error
 }
