@@ -16,6 +16,21 @@ func NewUserRepository(db *gorm.DB) UserDomain.Repository {
 }
 
 // =============================== code here ===================================
+// GetByUsername implements UserDomain.Repository
+// UpdateUser implements UserDomain.Repository
+func (ur userRepo) BanUser(id int, domain UserDomain.Users) (UserDomain.Users, error) {
+	var rec Users
+	domain.Status = false
+	err := ur.DB.Model(&rec).Where("id = ?", id).Update("status", domain.Status).Error
+	ur.DB.Where("id = ?", id).First(&rec)
+	return toDomain(rec), err
+}
+
+func (ur userRepo) GetByUsername(username string) (int, error) {
+	var rec Users
+	err := ur.DB.Where("username = ?", username).First(&rec).Error
+	return rec.ID, err
+}
 
 // GetById implements UserDomain.Repository
 func (ur userRepo) GetById(id int) (domain UserDomain.Users, err error) {

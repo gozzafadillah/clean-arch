@@ -21,12 +21,39 @@ func NewUserService(repo UserDomain.Repository, JWT *middlewares.ConfigJwt) User
 
 // ============================ Code Here ==============================
 // GetId implements UserDomain.Service
-func (us UserService) GetId(id int) (response UserDomain.Users, err error) {
-	response, err = us.Repository.GetById(id)
+func (us UserService) GetId(id int) (data UserDomain.Users, err error) {
+	data, err = us.Repository.GetById(id)
 	if err != nil {
 		return UserDomain.Users{}, err
 	}
-	return response, nil
+	return data, nil
+}
+
+// BanUser implements UserDomain.Service
+func (us UserService) BanUser(username string) (UserDomain.Users, error) {
+	var rec UserDomain.Users
+	id, err := us.Repository.GetByUsername(username)
+	if err != nil {
+		return UserDomain.Users{}, errors.New("user not found, please check again")
+	}
+	data, err := us.Repository.BanUser(id, rec)
+	if err != nil {
+		return UserDomain.Users{}, errors.New("user cant change status after get id")
+	}
+	return data, nil
+}
+
+// GetUsername implements UserDomain.Service
+func (us UserService) GetUsername(username string) (UserDomain.Users, error) {
+	id, err := us.Repository.GetByUsername(username)
+	if err != nil {
+		return UserDomain.Users{}, errors.New("username not found")
+	}
+	data, err := us.GetId(id)
+	if err != nil {
+		return UserDomain.Users{}, errors.New("id username not found")
+	}
+	return data, nil
 }
 
 // CreateToken implements UserDomain.Service

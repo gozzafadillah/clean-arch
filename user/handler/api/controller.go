@@ -2,8 +2,10 @@ package userApi
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
+	"github.com/gozzafadillah/app/middlewares"
 	UserDomain "github.com/gozzafadillah/user/domain"
 	"github.com/labstack/echo/v4"
 
@@ -21,7 +23,7 @@ func NewUserHandler(service UserDomain.Service) UserHandler {
 	}
 }
 
-func (uh UserHandler) Create(c echo.Context) error {
+func (uh *UserHandler) Create(c echo.Context) error {
 	req := request.RequestJSON{}
 	if err := c.Bind(&req); err != nil {
 		return errors.New("data invalid")
@@ -38,7 +40,7 @@ func (uh UserHandler) Create(c echo.Context) error {
 
 }
 
-func (uh UserHandler) Login(c echo.Context) error {
+func (uh *UserHandler) Login(c echo.Context) error {
 	req := request.RequestJSON{}
 
 	if err := c.Bind(&req); err != nil {
@@ -62,7 +64,47 @@ func (uh UserHandler) Login(c echo.Context) error {
 	})
 }
 
-func (uh UserHandler) UserRole(id int) (string, bool) {
+func (uh *UserHandler) BanUser(c echo.Context) error {
+	username := c.Param("username")
+
+	// Check user jwt
+	checkClaim := middlewares.GetUser(c)
+
+	// mencegah ban sesama admin
+	userInput, err := uh.service.GetId(checkClaim.ID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "user input unknown",
+		})
+	}
+	user, err := uh.service.GetUsername(username)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "user from request unknown",
+		})
+	}
+	if user.Role == userInput.Role {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "dont ban same admin",
+		})
+	}
+
+	// Ban User
+	res, err := uh.service.BanUser(username)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "username wrong",
+		})
+	}
+	fmt.Println("user ban :", res)
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "success ban user",
+		"rescode": http.StatusOK,
+		"data":    response.FromDomain(res),
+	})
+}
+
+func (uh *UserHandler) UserRole(id int) (string, bool) {
 	var role string
 	var status bool
 	user, err := uh.service.GetId(id)

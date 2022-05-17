@@ -25,6 +25,11 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	e.POST("/login", cl.UserHandler.Login)
 	e.POST("/register", cl.UserHandler.Create)
 
+	// Admin
+	admin := e.Group("admin")
+	admin.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("admin", cl.UserHandler))
+	admin.PUT("/ban/:username", cl.UserHandler.BanUser)
+
 	// product public
 	product := e.Group("product")
 	product.GET("/all", cl.ProductHandler.GetAllProduct)
