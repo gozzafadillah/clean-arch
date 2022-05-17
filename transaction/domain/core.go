@@ -3,15 +3,17 @@ package transactionDomain
 import "time"
 
 type Transaction struct {
-	ID             int
-	Code           string
-	User_Id        int
-	Total_Qty      int
-	Total_Price    float64
-	Shipping_Price float64
-	Shipping_Id    int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	ID               int
+	Code             string
+	User_Id          int
+	Total_Qty        int
+	Total_Price      float64
+	Shipping_Price   float64
+	Shipping_Name    string
+	Shipping_Package string
+	Etd              string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 type Checkout struct {
@@ -22,6 +24,8 @@ type Checkout struct {
 	Price           float64
 	Weight          float64
 	Destination     string
+	Courier         string
+	Package         string
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }

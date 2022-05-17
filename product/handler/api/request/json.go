@@ -9,14 +9,14 @@ import (
 type RequestJSON struct {
 	ID          int
 	Code        string
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Origin      int
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Origin      string  `json:"origin"`
 	Qty         int     `json:"qty"`
 	Price       int     `json:"price"`
 	Weight      float64 `json:"weight"`
 	Status      bool    `json:"status"`
-	Category_Id int
+	Category_Id int     `json:"category_id"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
@@ -40,11 +40,11 @@ func ToDomain(req RequestJSON) productDomain.Product {
 	return productDomain.Product{
 		Name:        req.Name,
 		Description: req.Description,
-		Origin:      1,
+		Origin:      req.Origin,
 		Qty:         req.Qty,
 		Price:       req.Price,
 		Weight:      req.Weight,
 		Status:      req.Status,
-		Category_Id: 1,
+		Category_Id: req.Category_Id,
 	}
 }

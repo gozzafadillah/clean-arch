@@ -2,9 +2,12 @@ package mysql
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/gozzafadillah/app/config"
 	productDomain "github.com/gozzafadillah/product/domain"
@@ -22,8 +25,67 @@ func NewTransactionRepository(db *gorm.DB) transactionDomain.Repository {
 	}
 }
 
+// CheckCourier implements transactionDomain.Repository
+func (TransactionRepo) CheckCourier(origin int, cityDest int, weight int, courier string, paket string) bool {
+	url := config.BaseURLRO + "cost"
+	client := &http.Client{}
+	payload := strings.NewReader("origin=" + strconv.Itoa(origin) + "&destination=" + strconv.Itoa(cityDest) + "&weight=" + strconv.Itoa(weight) + "&courier=" + courier)
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("key", config.Key)
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var responseObject transactionDomain.Ongkir
+	json.Unmarshal(body, &responseObject)
+	for i := 0; i < len(responseObject.Rajaongkir.Results); i++ {
+		if responseObject.Rajaongkir.Results[0].Code == courier && responseObject.Rajaongkir.Results[0].Costs[i].Service == paket {
+			return true
+		}
+	}
+	return false
+}
+
+// Ongkir implements transactionDomain.Repository
+func (tr TransactionRepo) Ongkir(origin int, cityDest int, weight int, courier string) (transactionDomain.Ongkir, error) {
+	url := config.BaseURLRO + "cost"
+	client := &http.Client{}
+	payload := strings.NewReader("origin=" + strconv.Itoa(origin) + "&destination=" + strconv.Itoa(cityDest) + "&weight=" + strconv.Itoa(weight) + "&courier=" + courier)
+	req, _ := http.NewRequest("POST", url, payload)
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("content-type", "application/x-www-form-urlencoded")
+	req.Header.Add("key", config.Key)
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Print(err.Error())
+	}
+
+	var responseObject transactionDomain.Ongkir
+	json.Unmarshal(body, &responseObject)
+	return responseObject, nil
+}
+
 // GetCityId implements transactionDomain.Repository
-func (ts TransactionRepo) GetCityId() (transactionDomain.CityRO, error) {
+func (ts TransactionRepo) GetCityId(city string) (int, error) {
 	url := config.BaseURLRO + "city"
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", url, nil)
@@ -40,7 +102,18 @@ func (ts TransactionRepo) GetCityId() (transactionDomain.CityRO, error) {
 
 	var responseObject transactionDomain.CityRO
 	json.Unmarshal(body, &responseObject)
-	return responseObject, nil
+
+	data := responseObject
+	var id int
+	for i := 0; i < len(data.Rajaongkir.Results)-1; i++ {
+		if data.Rajaongkir.Results[i].CityName == city {
+			cityId, _ := strconv.Atoi(data.Rajaongkir.Results[i].CityID)
+			fmt.Println("city id :", cityId)
+			id = cityId
+			return id, nil
+		}
+	}
+	return id, errors.New("city not found")
 }
 
 // GetTransaction implements transactionDomain.Repository
@@ -75,14 +148,16 @@ func (tr TransactionRepo) SaveCheckout(domainCheckout transactionDomain.Checkout
 }
 
 // Save implements transactionDomain.Repository
-func (tr TransactionRepo) SaveTransaction(code string, idUser int, checkout transactionDomain.Checkout) (int, error) {
+func (tr TransactionRepo) SaveTransaction(code string, idUser int, ongkir int, etd string, checkout transactionDomain.Checkout) (int, error) {
 	var transaction transactionDomain.Transaction
-	transaction.Shipping_Price = float64(3300) * checkout.Weight
-	transaction.Total_Price = checkout.Price + transaction.Shipping_Price
+	transaction.Shipping_Price = float64(ongkir)
 	transaction.Total_Qty = checkout.Qty
 	transaction.Code = code
 	transaction.User_Id = idUser
-	transaction.Shipping_Id = 1
+	transaction.Shipping_Name = checkout.Courier
+	transaction.Shipping_Package = checkout.Package
+	transaction.Total_Price = checkout.Price + transaction.Shipping_Price
+	transaction.Etd = etd
 	err := tr.DB.Create(&transaction).Error
 	return transaction.ID, err
 }

@@ -47,5 +47,5 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	authTransaction := e.Group("checkout")
 	authTransaction.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
 	authTransaction.POST("/:id", cl.TransactionHandler.CreateData)
-	authTransaction.GET("/cek", cl.TransactionHandler.CreateOngkir)
+	// authTransaction.GET("/cek", cl.TransactionHandler.CreateOngkir)
 }

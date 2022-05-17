@@ -12,7 +12,7 @@ type Products struct {
 	ID          int
 	Code        string
 	Name        string
-	Origin      int
+	Origin      string
 	Category_Id int
 	Description string
 	Qty         int

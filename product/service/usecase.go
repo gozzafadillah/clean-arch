@@ -48,7 +48,6 @@ func (ps ProductService) GetProductId(id int) (productDomain.Product, error) {
 // CreateProduct implements productDomain.Service
 func (ps ProductService) CreateProduct(domain productDomain.Product) (productDomain.Product, error) {
 	id, err := ps.Repository.SaveProduct(domain)
-	fmt.Println("id : ", id)
 	if err != nil {
 		return productDomain.Product{}, errorConv.Conversion(err)
 	}

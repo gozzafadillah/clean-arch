@@ -9,6 +9,7 @@ import (
 	productDomain "github.com/gozzafadillah/product/domain"
 	transactionDomain "github.com/gozzafadillah/transaction/domain"
 	"github.com/gozzafadillah/transaction/handler/api/request"
+	"github.com/gozzafadillah/transaction/handler/api/response"
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,18 +26,22 @@ func NewTransactionHandler(transaction transactionDomain.Service, product produc
 }
 
 func (th *TransactionHandler) CreateData(c echo.Context) error {
+	// input
 	id, _ := strconv.Atoi(c.Param("id"))
+
 	// request body from user
 	req := request.RequestJSONCheckout{}
 
+	// Get product
 	product, err := th.ServiceProduct.CheckoutProductId(id)
-	fmt.Println("product :", product)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": err,
 			"rescode": http.StatusBadRequest,
 		})
 	}
+
+	// cek quantity apakah melebihi kapasitas
 
 	// get user id
 	claims := middlewares.GetUser(c)
@@ -50,39 +55,71 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 			"rescode": http.StatusBadRequest,
 		})
 	}
+	// Membuat Checkout
 	respCheckout, err := th.ServiceTransaction.CreateCheckout(code, request.ToDomainCheckout(req), product)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": err,
+			"message": "error, checkout fail",
 			"rescode": http.StatusBadRequest,
 		})
 	}
-	fmt.Println("checkout : ", respCheckout)
+	// origin
+	originId, err := th.ServiceTransaction.CheckCity(product.Origin)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "origin city not found",
+			"rescode": http.StatusBadRequest,
+		})
+	}
+
+	//Destination
+	destinationId, err := th.ServiceTransaction.CheckCity(respCheckout.Destination)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "destination city not found",
+			"rescode": http.StatusBadRequest,
+		})
+	}
+	// Ongkir
+	ongkirPrice, etd, err := th.ServiceTransaction.Ongkir(originId, destinationId, int(respCheckout.Weight), respCheckout.Courier, respCheckout.Package)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "courier and package not found",
+			"rescode": http.StatusBadRequest,
+		})
+	}
 
 	// create transaction
-	transaction, err := th.ServiceTransaction.CreateTransaction(claims.ID, code, respCheckout)
+	transaction, err := th.ServiceTransaction.CreateTransaction(claims.ID, code, ongkirPrice, etd, respCheckout)
 	fmt.Println("transaction : ", transaction)
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
-			"message": err,
+			"message": "transaction fail",
 			"rescode": http.StatusBadRequest,
 		})
 	}
+
+	// mengurangi qty di product
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Checkout success",
+		"message": "transaction success",
 		"rescode": http.StatusOK,
-		"data":    transaction,
+		"data":    response.FromDomainCheckout(transaction),
 	})
 }
-func (th *TransactionHandler) CreateOngkir(c echo.Context) error {
-	id, err := th.ServiceTransaction.CheckCity("Bandung")
-	fmt.Println("id :", id)
-	if err != nil {
-		return err
-	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message": "Checkout success",
-		"rescode": http.StatusOK,
-		"data":    id,
-	})
-}
+
+// func (th *TransactionHandler) CreateOngkir(c echo.Context) error {
+// 	id, err := th.ServiceTransaction.CheckCity("Jakarta Tenggara")
+// 	fmt.Println("id :", id)
+// 	if err != nil {
+// 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+// 			"message": "City not found",
+// 			"rescode": http.StatusBadRequest,
+// 		})
+// 	}
+// 	return c.JSON(http.StatusOK, map[string]interface{}{
+// 		"message": "Checkout success",
+// 		"rescode": http.StatusOK,
+// 		"data":    id,
+// 	})
+// }

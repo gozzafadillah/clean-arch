@@ -9,7 +9,7 @@ type Product struct {
 	Code        string
 	Name        string
 	Description string
-	Origin      int
+	Origin      string
 	Qty         int
 	Price       int
 	Weight      float64

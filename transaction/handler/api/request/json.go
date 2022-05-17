@@ -12,11 +12,15 @@ type RequestJSONCheckout struct {
 	Price           float64
 	Weight          float64
 	Destination     string `json:"destination" form:"destination"`
+	Courier         string `json:"courier" form:"courier"`
+	Package         string `json:"package" form:"package"`
 }
 
 func ToDomainCheckout(req RequestJSONCheckout) transactionDomain.Checkout {
 	return transactionDomain.Checkout{
 		Qty:         req.Qty,
 		Destination: req.Destination,
+		Courier:     req.Courier,
+		Package:     req.Package,
 	}
 }
