@@ -1,4 +1,4 @@
-package service
+package serviceProduct
 
 import (
 	"errors"
