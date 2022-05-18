@@ -2,14 +2,18 @@ package serviceProduct
 
 import (
 	"errors"
-	"fmt"
 
-	errorConv "github.com/gozzafadillah/helper/error"
 	productDomain "github.com/gozzafadillah/product/domain"
 )
 
 type ProductService struct {
 	Repository productDomain.Repository
+}
+
+func NewProductService(repo productDomain.Repository) productDomain.Service {
+	return ProductService{
+		Repository: repo,
+	}
 }
 
 // CheckoutProductId implements productDomain.Service
@@ -21,17 +25,11 @@ func (ps ProductService) CheckoutProductId(id int) (productDomain.Product, error
 	return data, nil
 }
 
-func NewProductService(repo productDomain.Repository) productDomain.Service {
-	return ProductService{
-		Repository: repo,
-	}
-}
-
 // GetProducts implements productDomain.Service
 func (ps ProductService) GetProducts() ([]productDomain.Product, error) {
 	data, err := ps.Repository.GetProducts()
 	if err != nil {
-		return []productDomain.Product{}, errorConv.Conversion(err)
+		return []productDomain.Product{}, errors.New("data tidak adaa")
 	}
 	return data, nil
 }
@@ -40,7 +38,7 @@ func (ps ProductService) GetProducts() ([]productDomain.Product, error) {
 func (ps ProductService) GetProductId(id int) (productDomain.Product, error) {
 	data, err := ps.Repository.GetById(id)
 	if err != nil {
-		return productDomain.Product{}, errorConv.Conversion(err)
+		return productDomain.Product{}, errors.New("data tidak adaa")
 	}
 	return data, nil
 }
@@ -49,11 +47,11 @@ func (ps ProductService) GetProductId(id int) (productDomain.Product, error) {
 func (ps ProductService) CreateProduct(domain productDomain.Product) (productDomain.Product, error) {
 	id, err := ps.Repository.SaveProduct(domain)
 	if err != nil {
-		return productDomain.Product{}, errorConv.Conversion(err)
+		return productDomain.Product{}, errors.New("bad request")
 	}
 	data, err := ps.Repository.GetById(id)
 	if err != nil {
-		return productDomain.Product{}, errorConv.Conversion(err)
+		return productDomain.Product{}, errors.New("data tidak adaa")
 	}
 
 	return data, err
@@ -61,14 +59,13 @@ func (ps ProductService) CreateProduct(domain productDomain.Product) (productDom
 
 // DestroyProduct implements productDomain.Service
 func (ps ProductService) DestroyProduct(id int) (productDomain.Product, error) {
-	data, err1 := ps.Repository.GetById(id)
-	if err1 != nil {
+	data, err := ps.Repository.GetById(id)
+	if err != nil {
 		return productDomain.Product{}, errors.New("not found")
 	}
-	err2 := ps.Repository.Delete(id)
-	fmt.Println("id : ", id)
-	if err2 != nil {
-		errorConv.Conversion(err2)
+	delete := ps.Repository.Destroy(id)
+	if err := delete; err != nil {
+		return productDomain.Product{}, errors.New("not found")
 	}
 
 	return data, nil
@@ -78,22 +75,17 @@ func (ps ProductService) DestroyProduct(id int) (productDomain.Product, error) {
 func (ps ProductService) EditProduct(id int, domain productDomain.Product) (productDomain.Product, error) {
 	err := ps.Repository.Update(id, domain)
 	if err != nil {
-		return productDomain.Product{}, errorConv.Conversion(err)
+		return productDomain.Product{}, errors.New("data didn't update")
 	}
 	data, err := ps.Repository.GetById(id)
 	if err != nil {
-		return productDomain.Product{}, errorConv.Conversion(err)
+		return productDomain.Product{}, errors.New("data unknown")
 	}
 	return data, nil
 }
 
 // GetMinPrice implements productDomain.Service
-func (ps ProductService) GetMinPrice() ([]productDomain.Product, error) {
-	data, err := ps.Repository.GetProducts()
-	if err != nil {
-		return []productDomain.Product{}, errorConv.Conversion(err)
-	}
-	fmt.Println("array before ", data)
+func SortMin(data []productDomain.Product) {
 	var isDone = false
 	// Sort asc
 	for !isDone {
@@ -107,16 +99,21 @@ func (ps ProductService) GetMinPrice() ([]productDomain.Product, error) {
 			i++
 		}
 	}
-	fmt.Println("array after ", data)
+}
+
+func (ps ProductService) GetMinPrice() ([]productDomain.Product, error) {
+	data, err := ps.Repository.GetProducts()
+	if err != nil {
+		return []productDomain.Product{}, errors.New("data empty")
+	}
+
+	SortMin(data)
+
 	return data, nil
 }
 
 // GetMaxPrice implements productDomain.Service
-func (ps ProductService) GetMaxPrice() ([]productDomain.Product, error) {
-	data, err := ps.Repository.GetProducts()
-	if err != nil {
-		return []productDomain.Product{}, errorConv.Conversion(err)
-	}
+func SortMAX(data []productDomain.Product) {
 	var isDone = false
 	// Sort Desc
 	for !isDone {
@@ -130,6 +127,14 @@ func (ps ProductService) GetMaxPrice() ([]productDomain.Product, error) {
 			i++
 		}
 	}
+}
+func (ps ProductService) GetMaxPrice() ([]productDomain.Product, error) {
+	data, err := ps.Repository.GetProducts()
+	if err != nil {
+		return []productDomain.Product{}, errors.New("data empty")
+	}
+	SortMAX(data)
+
 	return data, nil
 }
 
@@ -146,7 +151,7 @@ func (ps ProductService) GetCategory(name string) ([]productDomain.Product, erro
 func (ps ProductService) GetCategoryById(id int) (productDomain.Category, error) {
 	data, err := ps.Repository.GetCategoryById(id)
 	if err != nil {
-		return productDomain.Category{}, errorConv.Conversion(err)
+		return productDomain.Category{}, errors.New("data tidak adaa")
 	}
 	return data, nil
 }
@@ -154,13 +159,12 @@ func (ps ProductService) GetCategoryById(id int) (productDomain.Category, error)
 // CreateCategory implements productDomain.Service
 func (ps ProductService) CreateCategory(domain productDomain.Category) (productDomain.Category, error) {
 	id, err := ps.Repository.SaveCategory(domain)
-	fmt.Println("id : ", id)
 	if err != nil {
-		return productDomain.Category{}, errorConv.Conversion(err)
+		return productDomain.Category{}, errors.New("category not save, check again")
 	}
 	data, err := ps.Repository.GetCategoryById(id)
 	if err != nil {
-		return productDomain.Category{}, errorConv.Conversion(err)
+		return productDomain.Category{}, errors.New("category not found")
 	}
 
 	return data, err
