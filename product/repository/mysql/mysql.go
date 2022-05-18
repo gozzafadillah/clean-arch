@@ -42,7 +42,7 @@ func (pr ProductRepo) GetProducts() ([]productDomain.Product, error) {
 }
 
 // Delete implements productDomain.Repository
-func (pr ProductRepo) Delete(id int) error {
+func (pr ProductRepo) Destroy(id int) error {
 	var rec Products
 	err := pr.DB.Unscoped().Delete(&rec, id).Error
 	return err

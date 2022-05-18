@@ -74,13 +74,13 @@ func (us UserService) Login(username string, password string) (string, error) {
 
 // InsertData implements userDomain.Service
 func (us UserService) InsertData(domain userDomain.Users) (response userDomain.Users, err error) {
-	id, errorResp := us.Repository.Save(domain)
+	id, err := us.Repository.Save(domain)
 
-	if errorResp != nil {
+	if err != nil {
 		return userDomain.Users{}, errors.New("can't insert to database")
 	}
-	record, errorResp2 := us.Repository.GetById(id)
-	if errorResp2 != nil {
+	record, err := us.Repository.GetById(id)
+	if err != nil {
 		return userDomain.Users{}, errors.New("data not found")
 	}
 	return record, nil

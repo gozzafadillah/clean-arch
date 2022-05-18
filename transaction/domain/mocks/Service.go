@@ -93,19 +93,6 @@ func (_m *Service) CreateTransaction(idUser int, code string, ongkir int, etd st
 	return r0, r1
 }
 
-// DestroyTransaction provides a mock function with given fields: id
-func (_m *Service) DestroyTransaction(id int) error {
-	ret := _m.Called(id)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(int) error); ok {
-		r0 = rf(id)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
 
 // GetCheckout provides a mock function with given fields: code
 func (_m *Service) GetCheckout(code string) (transactionDomain.Checkout, error) {

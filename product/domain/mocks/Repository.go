@@ -14,8 +14,8 @@ type Repository struct {
 	mock.Mock
 }
 
-// Delete provides a mock function with given fields: id
-func (_m *Repository) Delete(id int) error {
+// Destroy provides a mock function with given fields: id
+func (_m *Repository) Destroy(id int) error {
 	ret := _m.Called(id)
 
 	var r0 error
