@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -22,17 +24,12 @@ var Conf Config
 
 func InitDB() (DB *gorm.DB) {
 	Conf = Config{
-		// DBNAME:    os.Getenv("DBNAME"),
-		// DBUSER:    os.Getenv("DBUSER"),
-		// DBPASS:    os.Getenv("DBPASS"),
-		// DBHOST:    os.Getenv("DBHOST"),
-		// DBPORT:    os.Getenv("DBPORT"),
-		DBUSER:    "root",
-		DBPASS:    "",
-		DBHOST:    "host.docker.internal",
-		DBPORT:    "3306",
-		DBNAME:    "latihan-db-2",
-		JWTSecret: "12345",
+		DBNAME:    os.Getenv("DBNAME"),
+		DBUSER:    os.Getenv("DBUSER"),
+		DBPASS:    os.Getenv("DBPASS"),
+		DBHOST:    os.Getenv("DBHOST"),
+		DBPORT:    os.Getenv("DBPORT"),
+		JWTSecret: os.Getenv("JWTSecret"),
 	}
 
 	var err error
