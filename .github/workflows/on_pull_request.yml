@@ -17,7 +17,7 @@ jobs:
       mysql:
         image: mariadb:10.1
         env:
-          MYSQL_ROOT_PASSWORD: 
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: latihan-db-2
         ports:
           - 3306:3306
@@ -30,9 +30,9 @@ jobs:
         env:
           DBHOST: mysql
           DBUSER: root
-          DBPASS: 
+          DBPASS: root
           DBPORT: 3306
           DBNAME: latihan-db-2
         run: |
           go mod tidy
-           go test ./... -v -coverpkg=./user/...,./product/...,./transaction/... -coverprofile=cover.out && go tool cover -html=cover.out
+           go test ./... -v -coverpkg=./user/domain/abstract_test.go,./product/abstract_test.go,./transaction/abstract_test.go -coverprofile=cover.out
