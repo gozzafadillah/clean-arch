@@ -46,7 +46,7 @@ func (ur userRepo) GetById(id int) (domain userDomain.Users, err error) {
 func (ur userRepo) GetUsernamePassword(username string, password string) (domain userDomain.Users, err error) {
 	var record Users
 	errResp := ur.DB.Where("username = ?", username).First(&record).Error
-	if err := encryption.CheckPasswordHash(password, record.Password); !err {
+	if err := encryption.CheckPasswordHash(password, record.Password); !err || !record.Status {
 		return userDomain.Users{}, errors.New("username and password wrong")
 	}
 	return toDomain(record), errResp
