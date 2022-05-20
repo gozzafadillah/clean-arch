@@ -2,7 +2,6 @@ package userApi
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gozzafadillah/app/middlewares"
@@ -96,7 +95,6 @@ func (uh *UserHandler) BanUser(c echo.Context) error {
 			"message": "username wrong",
 		})
 	}
-	fmt.Println("user ban :", res)
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"message": "success ban user",
 		"rescode": http.StatusOK,

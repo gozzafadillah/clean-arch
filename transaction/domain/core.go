@@ -8,9 +8,9 @@ type Transaction struct {
 	User_Id          int
 	Total_Qty        int
 	Total_Price      float64
-	Shipping_Price   float64
 	Shipping_Name    string
 	Shipping_Package string
+	Shipping_Price   float64
 	Etd              string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
@@ -26,6 +26,9 @@ type Checkout struct {
 	Destination     string
 	Courier         string
 	Package         string
+	Etd             string
+	Shipping_Price  float64
+	Status          bool
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
 }

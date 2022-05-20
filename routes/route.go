@@ -49,8 +49,11 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	authCategory.POST("/create", cl.ProductHandler.CreateCategory)
 	authCategory.GET("/:id", cl.ProductHandler.GetCategoryById)
 
-	authTransaction := e.Group("checkout")
+	authCheckout := e.Group("checkout")
+	authCheckout.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
+	authCheckout.POST("/:id", cl.TransactionHandler.CreateData)
+
+	authTransaction := e.Group("transaction")
 	authTransaction.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
-	authTransaction.POST("/:id", cl.TransactionHandler.CreateData)
-	// authTransaction.GET("/cek", cl.TransactionHandler.CreateOngkir)
+	authTransaction.GET("/:code", cl.TransactionHandler.CreateTransaction)
 }
