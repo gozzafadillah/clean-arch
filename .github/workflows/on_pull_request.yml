@@ -1,0 +1,38 @@
+name: "on_pull_request"
+
+on:
+  pull_request:
+    branches:
+      - "master"
+  push:
+    branches:
+      - "master"
+
+jobs:
+  testing:
+    name: testing-api
+    runs-on: ubuntu-latest
+    container: golang:1.17
+    services:
+      mysql:
+        image: mariadb:10.1
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: latihan-db-2
+        ports:
+          - 3306:3306
+    strategy:
+      matrix:
+        go: [ "1.17" ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: running test
+        env:
+          DBHOST: mysql
+          DBPASS: root
+          DBUSER: root
+          DBPORT: 3306
+          DBNAME: latihan-db-2
+        run: |
+          go mod tidy
+          go test ./...

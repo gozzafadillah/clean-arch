@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  mp-mysql-server:
+    image: mariadb:10.7
+    environment:
+      - MARIADB_ROOT_PASSWORD=root
+      - MARIADB_DATABASE=latihan-db-2
+    ports:
+      - "33006:3306"
+  mini-project:
+    build: .
+    depends_on:
+      - mp-mysql-server
+    container_name: mp-1.0
+    ports:
+      - "19000:8080"
+    env_file:
+      - "./config.env"

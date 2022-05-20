@@ -26,7 +26,7 @@ func main() {
 	migrate.AutoMigrate(db)
 
 	configJWT := _middleware.ConfigJwt{
-		SecretJWT: "2345",
+		SecretJWT: config.Conf.JWTSecret,
 	}
 
 	e := echo.New()
