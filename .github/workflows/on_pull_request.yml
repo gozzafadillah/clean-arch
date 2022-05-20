@@ -35,4 +35,4 @@ jobs:
           DBNAME: latihan-db-2
         run: |
           go mod tidy
-          go test ./... -coverprofile=cover.out
+           go test ./... -v -coverpkg=./user/...,./product/...,./transaction/... -coverprofile=cover.out && go tool cover -html=cover.out
