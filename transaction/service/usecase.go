@@ -94,7 +94,7 @@ func (ts transactionService) Ongkir(origin int, dest int, weight int, courier st
 func (ts transactionService) UpdateStok(id int, qty int) error {
 	err := ts.Repository.UpdateQty(id, qty)
 	if err != nil {
-		return errors.New("qty cant update")
+		return errors.New("qty cant updates")
 	}
 	return nil
 }
