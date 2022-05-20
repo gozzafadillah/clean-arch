@@ -1,6 +1,9 @@
 package mysql
 
 import (
+	"errors"
+
+	"github.com/gozzafadillah/helper/encryption"
 	userDomain "github.com/gozzafadillah/user/domain"
 	"gorm.io/gorm"
 )
@@ -42,7 +45,10 @@ func (ur userRepo) GetById(id int) (domain userDomain.Users, err error) {
 // GetUsernamePassword implements userDomain.Repository
 func (ur userRepo) GetUsernamePassword(username string, password string) (domain userDomain.Users, err error) {
 	var record Users
-	errResp := ur.DB.Where("username = ? AND password = ?", username, password).First(&record).Error
+	errResp := ur.DB.Where("username = ?", username).First(&record).Error
+	if err := encryption.CheckPasswordHash(password, record.Password); !err {
+		return userDomain.Users{}, errors.New("username and password wrong")
+	}
 	return toDomain(record), errResp
 }
 
