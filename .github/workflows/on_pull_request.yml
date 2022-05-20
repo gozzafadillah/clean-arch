@@ -29,7 +29,7 @@ jobs:
       - name: running test
         env:
           DBHOST: mysql
-          DBPASS: root
+          DBPASS: 
           DBUSER: root
           DBPORT: 3306
           DBNAME: latihan-db-2
