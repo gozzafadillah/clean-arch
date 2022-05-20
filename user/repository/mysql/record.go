@@ -3,7 +3,7 @@ package mysql
 import (
 	"time"
 
-	UserDomain "github.com/gozzafadillah/user/domain"
+	userDomain "github.com/gozzafadillah/user/domain"
 	"gorm.io/gorm"
 )
 
@@ -17,8 +17,8 @@ type Users struct {
 	Status   bool
 }
 
-func toDomain(rec Users) UserDomain.Users {
-	return UserDomain.Users{
+func toDomain(rec Users) userDomain.Users {
+	return userDomain.Users{
 		ID:        int(rec.ID),
 		Name:      rec.Name,
 		Username:  rec.Username,

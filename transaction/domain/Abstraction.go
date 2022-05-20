@@ -9,7 +9,6 @@ type Service interface {
 	GetCode() string
 	// Transaction
 	CreateTransaction(idUser int, code string, ongkir int, etd string, checkout Checkout) (Transaction, error)
-	DestroyTransaction(id int) error
 
 	// Checkout
 	CreateCheckout(code string, domainCheckout Checkout, domain productDomain.Product, ongkir int, etd string) (Checkout, error)

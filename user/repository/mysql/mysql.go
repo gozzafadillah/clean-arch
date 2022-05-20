@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	UserDomain "github.com/gozzafadillah/user/domain"
+	userDomain "github.com/gozzafadillah/user/domain"
 	"gorm.io/gorm"
 )
 
@@ -9,16 +9,16 @@ type userRepo struct {
 	DB *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserDomain.Repository {
+func NewUserRepository(db *gorm.DB) userDomain.Repository {
 	return userRepo{
 		DB: db,
 	}
 }
 
 // =============================== code here ===================================
-// GetByUsername implements UserDomain.Repository
-// UpdateUser implements UserDomain.Repository
-func (ur userRepo) BanUser(id int, domain UserDomain.Users) (UserDomain.Users, error) {
+// GetByUsername implements userDomain.Repository
+// UpdateUser implements userDomain.Repository
+func (ur userRepo) BanUser(id int, domain userDomain.Users) (userDomain.Users, error) {
 	var rec Users
 	domain.Status = false
 	err := ur.DB.Model(&rec).Where("id = ?", id).Update("status", domain.Status).Error
@@ -32,22 +32,22 @@ func (ur userRepo) GetByUsername(username string) (int, error) {
 	return rec.ID, err
 }
 
-// GetById implements UserDomain.Repository
-func (ur userRepo) GetById(id int) (domain UserDomain.Users, err error) {
+// GetById implements userDomain.Repository
+func (ur userRepo) GetById(id int) (domain userDomain.Users, err error) {
 	var newRecord Users
 	err = ur.DB.Where("id = ?", id).First(&newRecord).Error
 	return toDomain(newRecord), err
 }
 
-// GetUsernamePassword implements UserDomain.Repository
-func (ur userRepo) GetUsernamePassword(username string, password string) (domain UserDomain.Users, err error) {
+// GetUsernamePassword implements userDomain.Repository
+func (ur userRepo) GetUsernamePassword(username string, password string) (domain userDomain.Users, err error) {
 	var record Users
 	errResp := ur.DB.Where("username = ? AND password = ?", username, password).First(&record).Error
 	return toDomain(record), errResp
 }
 
-// Save implements UserDomain.Repository
-func (ur userRepo) Save(domain UserDomain.Users) (id int, err error) {
+// Save implements userDomain.Repository
+func (ur userRepo) Save(domain userDomain.Users) (id int, err error) {
 	domain.Role = "customer"
 	domain.Status = true
 	err = ur.DB.Save(&domain).Error

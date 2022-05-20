@@ -20,22 +20,24 @@ type ControllerList struct {
 func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 
 	middlewares.LogMiddleware(e)
-
-	// user
+	// product public
 	e.POST("/login", cl.UserHandler.Login)
 	e.POST("/register", cl.UserHandler.Create)
 
-	// Admin
-	admin := e.Group("admin")
-	admin.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("admin", cl.UserHandler))
-	admin.PUT("/ban/:username", cl.UserHandler.BanUser)
-
-	// product public
 	product := e.Group("product")
 	product.GET("/all", cl.ProductHandler.GetAllProduct)
-	product.GET("/all", cl.ProductHandler.FilterPrice)
+	product.GET("/all/price", cl.ProductHandler.FilterPrice)
 	product.GET("/", cl.ProductHandler.Category)
 	product.GET("/:id", cl.ProductHandler.GetProduct)
+
+	// Customer
+	authCheckout := e.Group("checkout")
+	authCheckout.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
+	authCheckout.POST("/:id", cl.TransactionHandler.CreateData)
+
+	authTransaction := e.Group("transaction")
+	authTransaction.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
+	authTransaction.GET("/:code", cl.TransactionHandler.CreateTransaction)
 
 	// admin only / private
 	authProduct := e.Group("product")
@@ -49,11 +51,8 @@ func (cl *ControllerList) RouteRegister(e *echo.Echo) {
 	authCategory.POST("/create", cl.ProductHandler.CreateCategory)
 	authCategory.GET("/:id", cl.ProductHandler.GetCategoryById)
 
-	authCheckout := e.Group("checkout")
-	authCheckout.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
-	authCheckout.POST("/:id", cl.TransactionHandler.CreateData)
+	admin := e.Group("admin")
+	admin.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("admin", cl.UserHandler))
+	admin.PUT("/ban/:username", cl.UserHandler.BanUser)
 
-	authTransaction := e.Group("transaction")
-	authTransaction.Use(middleware.JWTWithConfig(cl.JWTMiddleware), validator.RoleValidation("customer", cl.UserHandler))
-	authTransaction.GET("/:code", cl.TransactionHandler.CreateTransaction)
 }

@@ -49,7 +49,7 @@ func (th *TransactionHandler) CreateData(c echo.Context) error {
 	}
 
 	// cek quantity apakah melebihi kapasitas
-	if req.Qty >= product.Qty {
+	if req.Qty > product.Qty {
 		return c.JSON(http.StatusBadRequest, map[string]interface{}{
 			"message": "qty not enough",
 			"rescode": http.StatusBadRequest,

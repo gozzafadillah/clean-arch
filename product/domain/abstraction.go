@@ -28,5 +28,5 @@ type Repository interface {
 	SaveProduct(domain Product) (int, error)
 	SaveCategory(domain Category) (int, error)
 	Update(id int, domain Product) error
-	Delete(id int) error
+	Destroy(id int) error
 }
