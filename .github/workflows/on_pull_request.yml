@@ -25,11 +25,11 @@ jobs:
       matrix:
         go: [ "1.17" ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - name: running test
         env:
           DBHOST: mysql
-          DBPASS: 
+          DBPASS: root
           DBUSER: root
           DBPORT: 3306
           DBNAME: latihan-db-2
