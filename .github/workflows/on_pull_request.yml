@@ -15,7 +15,7 @@ jobs:
     container: golang:1.17
     services:
       mysql:
-        image: mariadb:10.7
+        image: mariadb:10.1
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: latihan-db-2
