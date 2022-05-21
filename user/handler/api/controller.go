@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gozzafadillah/app/middlewares"
+	"github.com/gozzafadillah/helper/encryption"
 	userDomain "github.com/gozzafadillah/user/domain"
 	"github.com/labstack/echo/v4"
 
@@ -24,9 +25,18 @@ func NewUserHandler(service userDomain.Service) UserHandler {
 
 func (uh *UserHandler) Create(c echo.Context) error {
 	req := request.RequestJSON{}
+
 	if err := c.Bind(&req); err != nil {
 		return errors.New("data invalid")
 	}
+
+	encrypt, err := encryption.HashPassword(req.Password)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"message": "password failed encryption",
+		})
+	}
+	req.Password = encrypt
 
 	responseData, errResp := uh.service.InsertData(request.ToDomain(req))
 	if errResp != nil {
