@@ -7,10 +7,25 @@ services:
       - MARIADB_DATABASE=latihan-db-2
     ports:
       - "33006:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root",  "-proot", "-e", "show schemas"]
+      interval: 10s
+
   mini-project:
     build: .
+    restart: always
     depends_on:
-      - mp-mysql-server
+        mp-mysql-server:
+          condition: service_healthy
+    environment:
+      DBNAME: latihan-db-2
+      DBUSER: root
+      DBPASS: root
+      DBHOST: mp-mysql-server
+      DBPORT: 3306
+      JWTSecret: "12345"
     container_name: mp-1.0
     ports:
       - "19000:8080"
